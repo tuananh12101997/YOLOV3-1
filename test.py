@@ -1,13 +1,13 @@
-from torch.utils.data import DataLoader
 import utils.gpu as gpu
-from model.yolov3 import Yolov3
-from tqdm import tqdm
-from utils.tools import *
-from eval.evaluator import Evaluator
 import argparse
 import os
 import config.yolov3_config_voc as cfg
 from utils.visualize import *
+from model.yolov3 import Yolov3
+from tqdm import tqdm
+from utils.tools import *
+from eval.evaluator import Evaluator
+from torch.utils.data import DataLoader
 
 # import os
 # os.environ["CUDA_VISIBLE_DEVICES"]='0'

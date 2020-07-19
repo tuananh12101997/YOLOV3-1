@@ -1,7 +1,7 @@
 # coding=utf-8
 # project
-DATA_PATH = "/home/leon/data/data/VOC"
-PROJECT_PATH = "/home/leon/doc/code/python_code/YOLOV3"
+DATA_PATH = "/home/ubuntu/temps"
+PROJECT_PATH = "/vinai/anhnt479/Project/BackdoorDetection/YOLO_Unofficial/YOLOV3-1"
 
 
 DATA = {"CLASSES":['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
@@ -22,11 +22,11 @@ MODEL = {"ANCHORS":[[(1.25, 1.625), (2.0, 3.75), (4.125, 2.875)],  # Anchors for
 TRAIN = {
          "TRAIN_IMG_SIZE":448,
          "AUGMENT":True,
-         "BATCH_SIZE":8,
+         "BATCH_SIZE":16,
          "MULTI_SCALE_TRAIN":True,
          "IOU_THRESHOLD_LOSS":0.5,
          "EPOCHS":50,
-         "NUMBER_WORKERS":4,
+         "NUMBER_WORKERS":32,
          "MOMENTUM":0.9,
          "WEIGHT_DECAY":0.0005,
          "LR_INIT":1e-4,

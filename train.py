@@ -1,24 +1,21 @@
 import logging
 import utils.gpu as gpu
-from model.yolov3 import Yolov3
-from model.loss.yolo_loss import YoloV3Loss
 import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
-from torch.utils.data import DataLoader
 import utils.datasets as data
 import time
 import random
 import argparse
+import config.yolov3_config_voc as cfg
+from utils import cosine_lr_scheduler
+from utils.misc import progress_bar
 from eval.evaluator import *
 from utils.tools import *
 from tensorboardX import SummaryWriter
-import config.yolov3_config_voc as cfg
-from utils import cosine_lr_scheduler
-
-
-# import os
-# os.environ["CUDA_VISIBLE_DEVICES"]='2'
+from torch.utils.data import DataLoader
+from model.yolov3 import Yolov3
+from model.loss.yolo_loss import YoloV3Loss
 
 
 class Trainer(object):
@@ -93,8 +90,9 @@ class Trainer(object):
         print("Train datasets number is : {}".format(len(self.train_dataset)))
 
         for epoch in range(self.start_epoch, self.epochs):
-            self.yolov3.train()
+            print("\nEpoch {}:".format(epoch))
 
+            self.yolov3.train()
             mloss = torch.zeros(4)
             for i, (imgs, label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes)  in enumerate(self.train_dataloader):
 
@@ -118,24 +116,26 @@ class Trainer(object):
                 self.optimizer.step()
 
                 # Update running mean of tracked metrics
-                loss_items = torch.tensor([loss_giou, loss_conf, loss_cls, loss])
+                loss_items = torch.tensor([loss_giou.detach(), loss_conf.detach(), loss_cls.detach(), 
+                                           loss.detach()])
                 mloss = (mloss * i + loss_items) / (i + 1)
 
                 # Print batch results
-                if i%10==0:
-                    s = ('Epoch:[ %d | %d ]    Batch:[ %d | %d ]    loss_giou: %.4f    loss_conf: %.4f    loss_cls: %.4f    loss: %.4f    '
-                         'lr: %g') % (epoch, self.epochs - 1, i, len(self.train_dataloader) - 1, mloss[0],mloss[1], mloss[2], mloss[3],
-                                      self.optimizer.param_groups[0]['lr'])
-                    print(s)
+                if i%5==0:
+                    s = " Loss_giou: {:.4f} | Loss_conf: {:.4f} | Loss_cls: {:.4f} | Loss: {:.4f} | lr: {:.5f}".format(mloss[0], 
+                                                                                                            mloss[1], 
+                                                                                                            mloss[2], mloss[3], 
+                                                                                                            self.optimizer.param_groups[0]['lr'])
+                    progress_bar(i, len(self.train_dataloader), s)
 
                 # multi-sclae training (320-608 pixels) every 10 batches
                 if self.multi_scale_train and (i+1)%10 == 0:
                     self.train_dataset.img_size = random.choice(range(10,20)) * 32
-                    print("multi_scale_img_size : {}".format(self.train_dataset.img_size))
+                    #print("multi_scale_img_size : {}".format(self.train_dataset.img_size))
 
             mAP = 0
             if epoch >= 20:
-                print('*'*20+"Validate"+'*'*20)
+                print('\n' + '*'*20+"Validate" + '*'*20)
                 with torch.no_grad():
                     APs = Evaluator(self.yolov3).APs_voc()
                     for i in APs:
@@ -145,7 +145,7 @@ class Trainer(object):
                     print('mAP:%g'%(mAP))
 
             self.__save_model_weights(epoch, mAP)
-            print('best mAP : %g' % (self.best_mAP))
+            print('\nBest mAP : %g' % (self.best_mAP))
 
 
 if __name__ == "__main__":

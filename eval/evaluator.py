@@ -1,16 +1,17 @@
 import config.yolov3_config_voc as cfg
 import os
 import shutil
-from eval import voc_eval
-from utils.datasets import *
-from utils.gpu import *
 import cv2
 import numpy as np
-from utils.data_augment import *
 import torch
 from utils.tools import *
 from tqdm import tqdm
 from utils.visualize import *
+from eval import voc_eval
+from utils.datasets import *
+from utils.gpu import *
+from utils.data_augment import *
+
 
 
 class Evaluator(object):

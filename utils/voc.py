@@ -6,16 +6,7 @@ import os
 from tqdm import tqdm
 
 
-
 def parse_voc_annotation(data_path, file_type, anno_path, use_difficult_bbox=False):
-    """
-    解析 pascal voc数据集的annotation, 表示的形式为[image_global_path xmin,ymin,xmax,ymax,cls_id]
-    :param data_path: 数据集的路径 , 如 D:\doc\data\VOC\VOCtrainval-2007\VOCdevkit\VOC2007
-    :param file_type: 文件的类型， 'trainval''train''val'
-    :param anno_path: 标签存储路径
-    :param use_difficult_bbox: 是否适用difficult==1的bbox
-    :return: 数据集大小
-    """
     classes = cfg.DATA["CLASSES"]
     img_inds_file = os.path.join(data_path, 'ImageSets', 'Main', file_type+'.txt')
     with open(img_inds_file, 'r') as f:
@@ -48,14 +39,14 @@ def parse_voc_annotation(data_path, file_type, anno_path, use_difficult_bbox=Fal
 
 if __name__ =="__main__":
     # train_set :  VOC2007_trainval 和 VOC2012_trainval
-    train_data_path_2007 = os.path.join(cfg.DATA_PATH, 'VOCtrainval-2007', 'VOCdevkit', 'VOC2007')
-    train_data_path_2012 = os.path.join(cfg.DATA_PATH, 'VOCtrainval-2012', 'VOCdevkit', 'VOC2012')
+    train_data_path_2007 = os.path.join(cfg.DATA_PATH,  'VOCdevkit', 'VOC2007')
+    train_data_path_2012 = os.path.join(cfg.DATA_PATH,  'VOCdevkit', 'VOC2012')
     train_annotation_path = os.path.join('../data', 'train_annotation.txt')
     if os.path.exists(train_annotation_path):
         os.remove(train_annotation_path)
 
     # val_set   : VOC2007_test
-    test_data_path_2007 = os.path.join(cfg.DATA_PATH, 'VOCtest-2007', 'VOCdevkit', 'VOC2007')
+    test_data_path_2007 = os.path.join(cfg.DATA_PATH, 'VOC', 'VOCdevkit', 'VOC2007')
     test_annotation_path = os.path.join('../data', 'test_annotation.txt')
     if os.path.exists(test_annotation_path):
         os.remove(test_annotation_path)
